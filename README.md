@@ -1,36 +1,109 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Central de Ajuda — Lila Brand
 
-## Getting Started
+Front-end em **Next.js 16 (App Router) + TypeScript + CSS Modules** da Central de Ajuda,
+implementado a partir do design `Central de Ajuda.dc.html`.
 
-First, run the development server:
+## O que a página tem
+
+- Barra de avisos com marquee infinito
+- Header fixo com logo e selo "Central de ajuda"
+- Hero com busca instantânea (FAQ + atalhos), atalhos rápidos em chips e estado "nada encontrado"
+- Formulário de contato que **envia a mensagem por e-mail**
+- Acordeão de dúvidas frequentes (a busca abre e rola até a resposta)
+- CTA de WhatsApp, rodapé e botão flutuante de WhatsApp
+
+## Rodando localmente
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+bun install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+bun run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Abre em http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Configurar o envio de e-mail
 
-## Learn More
+Toda mensagem enviada no formulário cai em **lilaabrand@gmail.com**
+(definido em [lib/site-config.ts](lib/site-config.ts), sobrescrevível por `CONTACT_TO_EMAIL`).
 
-To learn more about Next.js, take a look at the following resources:
+Copie o arquivo de exemplo:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cp .env.example .env.local
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Depois escolha **uma** das opções abaixo.
 
-## Deploy on Vercel
+### Opção A — Resend (recomendada)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Crie uma conta gratuita em https://resend.com
+2. Gere uma API key em https://resend.com/api-keys
+3. No `.env.local`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+RESEND_API_KEY=re_sua_chave_aqui
+```
+
+Sem domínio próprio verificado, o remetente fica `onboarding@resend.dev` — funciona
+normalmente para receber. Com domínio verificado, preencha também
+`CONTACT_FROM_EMAIL="Lila Brand <contato@seudominio.com.br>"`.
+
+### Opção B — SMTP do Gmail
+
+1. Ative a verificação em duas etapas na conta Google
+2. Gere uma **Senha de app** em https://myaccount.google.com/apppasswords
+3. No `.env.local`:
+
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=lilaabrand@gmail.com
+SMTP_PASS=a_senha_de_app_de_16_letras
+```
+
+A senha normal do Gmail **não** funciona — precisa ser a senha de app.
+
+> Se nenhuma das duas estiver configurada, o formulário responde
+> "O envio de e-mail ainda não foi configurado neste site" e nada é enviado.
+
+## Como o formulário funciona
+
+`POST /api/contact` ([app/api/contact/route.ts](app/api/contact/route.ts)):
+
+- valida nome, contato e mensagem
+- só aceita assuntos da lista oficial
+- descarta bots via campo honeypot invisível
+- limita a 5 envios por IP a cada 10 minutos
+- monta um e-mail HTML + texto e define `Reply-To` com o e-mail de quem escreveu,
+  então basta responder na própria caixa de entrada
+- o e-mail é disparado no **envio** do formulário (não a cada tecla digitada,
+  para não encher a caixa de entrada de mensagens pela metade)
+
+O link "Enviar essa mensagem por lá" continua abrindo o WhatsApp já com o texto
+preenchido, como no design original.
+
+## Deploy
+
+Feito para a Vercel (`vercel deploy`) ou qualquer host Node. Lembre de cadastrar as
+variáveis de ambiente no painel do host — `.env.local` não vai para o repositório.
+
+## Estrutura
+
+```
+app/
+  layout.tsx              fonte Poppins, metadata
+  page.tsx                composição da página
+  globals.css             reset, tokens de cor, keyframes
+  api/contact/route.ts    recebe o formulário e envia o e-mail
+components/               um componente + um CSS Module por bloco da página
+lib/
+  site-config.ts          logo, WhatsApp, endereço, e-mail de destino
+  faq.ts                  perguntas, atalhos, chips, assuntos
+  search.ts               busca com normalização de acentos e ranking
+  whatsapp.ts             montagem do link click-to-chat
+  mailer.ts               Resend com fallback SMTP
+  rate-limit.ts           limitador em memória
+```
