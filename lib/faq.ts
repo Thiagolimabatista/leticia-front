@@ -44,8 +44,8 @@ export const FAQ: readonly FaqEntry[] = [
   },
   {
     q: 'Vocês têm loja física?',
-    a: 'Nosso atendimento é 100% online. Toda a curadoria, provas e indicações acontecem pelo WhatsApp com a nossa equipe. Estamos em Uberaba/MG: Av. Raul Jardim, 426 — Sala 2, Dom Eduardo II.',
-    tags: 'loja fisica endereco uberaba retirada showroom local',
+    a: 'Nosso atendimento é 100% online. Toda a curadoria, provas e indicações acontecem pelo WhatsApp com a nossa equipe. Estamos na Avenida Cesário Alvim, 3550.',
+    tags: 'loja fisica endereco cesario alvim retirada showroom local',
   },
   {
     q: 'Posso cancelar ou alterar um pedido já feito?',

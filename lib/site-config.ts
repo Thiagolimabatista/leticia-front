@@ -13,7 +13,4 @@ export const CONTACT_INBOX = 'lilaabrand@gmail.com' as const
 
 export const BUSINESS_HOURS = 'Seg. a sex., 9h às 18h' as const
 
-export const ADDRESS_LINES = [
-  'Av. Raul Jardim, 426 — Sala 2 · Dom Eduardo II · Uberaba/MG',
-  'CEP 38.057-841',
-] as const
+export const ADDRESS_LINES = ['Avenida Cesário Alvim, 3550'] as const

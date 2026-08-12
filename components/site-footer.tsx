@@ -6,6 +6,7 @@ import {
   WHATSAPP_GREETING,
 } from '@/lib/site-config'
 import { buildWhatsAppLink } from '@/lib/whatsapp'
+import { Fragment } from 'react'
 import styles from './site-footer.module.css'
 
 export function SiteFooter() {
@@ -15,9 +16,12 @@ export function SiteFooter() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={LOGO_URL} alt="LILA BRAND" className={styles.logo} />
         <p className={styles.address}>
-          {ADDRESS_LINES[0]}
-          <br />
-          {ADDRESS_LINES[1]}
+          {ADDRESS_LINES.map((line, index) => (
+            <Fragment key={line}>
+              {index > 0 && <br />}
+              {line}
+            </Fragment>
+          ))}
         </p>
       </div>
       <div className={styles.contact}>
